@@ -1,9 +1,5 @@
-function App() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-red-500 text-white text-4xl">
-      ¡Tailwind CSS está funcionando!
-    </div>
-  );
-}
+import AppRouter from "./router/AppRouter";
 
-export default App;
+export default function App() {
+  return <AppRouter />;
+}
