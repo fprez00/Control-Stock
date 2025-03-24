@@ -14,16 +14,16 @@ export const getProducts = async (req, res) => {
 export const createProduct = async (req, res) => {
   try {
     const { nombre, descripcion, precio, stock } = req.body;
-    
-    // Ejemplo: Insertar en la DB
-    const userId = req.user?.id || 1; // Por ejemplo, 1
 
-  await pool.query(
-    "INSERT INTO productos (nombre, descripcion, precio, stock, created_by) VALUES (?, ?, ?, ?, ?)",
-    [nombre, descripcion, precio, stock, userId]
-  );
-    
-    return res.status(201).json({ message: "Producto creado" });
+    // userID real, obtenido de req.user gracias al middleware
+    const userId = req.user.id;
+
+    await pool.query(
+      "INSERT INTO productos (nombre, descripcion, precio, stock, created_by) VALUES (?, ?, ?, ?, ?)",
+      [nombre, descripcion, precio, stock, userId]
+    );
+
+    return res.status(201).json({ message: "Producto creado correctamente" });
   } catch (error) {
     console.error("Error al crear producto:", error);
     return res.status(500).json({ message: "Error en el servidor", error });

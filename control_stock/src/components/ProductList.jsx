@@ -25,6 +25,8 @@ export default function ProductList() {
     fetchProducts();
   }, [token]);
 
+  
+
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">Lista de Productos</h1>
@@ -33,6 +35,7 @@ export default function ProductList() {
           <p>Nombre: {prod.nombre}</p>
           <p>Precio: {prod.precio}</p>
           <p>Stock: {prod.stock}</p>
+          <p>Creado por: {prod.created_by}</p>
         </div>
       ))}
     </div>

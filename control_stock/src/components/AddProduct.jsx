@@ -15,7 +15,7 @@ export default function AddProduct() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Enviamos el token
         },
         body: JSON.stringify({ nombre, descripcion, precio, stock }),
       });
@@ -23,16 +23,15 @@ export default function AddProduct() {
         console.error("Error al crear producto");
         return;
       }
-      console.log("Producto creado con éxito");
-      // Podrías limpiar el formulario
+      console.log("Producto creado correctamente");
+      // Limpia el formulario
       setNombre("");
       setDescripcion("");
       setPrecio("");
       setStock("");
     } catch (error) {
-        console.error("Error al crear producto:", error);
-        res.status(500).json({ message: "Error en el servidor", error });
-      }
+      console.error("Error al enviar producto:", error);
+    }
   };
 
   return (

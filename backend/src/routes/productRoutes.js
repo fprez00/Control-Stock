@@ -6,7 +6,7 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controllers/productController.js";
-// import auth from "../middlewares/auth.js" (opcional, para rutas protegidas)
+import auth from "../middlewares/auth.js";  // Importamos
 
 const router = Router();
 
@@ -15,7 +15,7 @@ router.get("/", getProducts);
 
 // POST => /api/products
 // Si quieres proteger: router.post("/", auth, createProduct);
-router.post("/", createProduct);
+router.post("/", auth, createProduct);
 
 // GET => /api/products/:id
 router.get("/:id", getProductById);
