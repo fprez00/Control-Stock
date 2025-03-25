@@ -4,7 +4,7 @@ import {
   createProduct,
   getProductById,
   updateProduct,
-  deleteProduct,
+  disableProduct,
 } from "../controllers/productController.js";
 import auth from "../middlewares/auth.js";  // Importamos
 
@@ -21,9 +21,11 @@ router.post("/", auth, createProduct);
 router.get("/:id", getProductById);
 
 // PUT => /api/products/:id
-router.put("/:id", updateProduct);
+router.patch("/:id", auth, updateProduct);
 
 // DELETE => /api/products/:id
-router.delete("/:id", deleteProduct);
+// Digamos que quieres "desactivar" el producto con un PATCH
+router.patch("/:id/disable", auth, disableProduct);
+
 
 export default router;

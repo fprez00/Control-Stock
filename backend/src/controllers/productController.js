@@ -46,24 +46,35 @@ export const getProductById = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, descripcion, precio, stock } = req.body;
+    const { nombre, precio, stock } = req.body;
+    
+    // Valida si llegan datos
+    // if (!nombre || !precio ...) { ... }
 
-    const sql = "UPDATE productos SET nombre=?, descripcion=?, precio=?, stock=? WHERE id=?";
-    await pool.query(sql, [nombre, descripcion, precio, stock, id]);
+    // Realiza el UPDATE en la DB
+    await pool.query(
+      "UPDATE productos SET nombre = ?, precio = ?, stock = ? WHERE id = ?",
+      [nombre, precio, stock, id]
+    );
 
-    res.json({ message: "Producto actualizado" });
+    return res.json({ message: "Producto actualizado con éxito" });
   } catch (error) {
-    res.status(500).json({ message: "Error al actualizar producto", error });
+    console.error("Error updateProduct:", error);
+    return res.status(500).json({ message: "Error en el servidor" });
   }
 };
 
+
 // Eliminar producto
-export const deleteProduct = async (req, res) => {
+export const disableProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    await pool.query("DELETE FROM productos WHERE id=?", [id]);
-    res.json({ message: "Producto eliminado" });
+    // Actualiza sólo is_active
+    await pool.query("UPDATE productos SET is_active = false WHERE id = ?", [id]);
+    
+    return res.json({ message: "Producto desactivado correctamente" });
   } catch (error) {
-    res.status(500).json({ message: "Error al eliminar producto", error });
+    console.error("Error al desactivar producto:", error);
+    return res.status(500).json({ message: "Error en el servidor" });
   }
 };
