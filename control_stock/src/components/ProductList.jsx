@@ -3,22 +3,21 @@ import Product from "./chilldrentComponents/Product";
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
-  const [isEdited, setIsEdited] = useState(false); 
-  const [editProd, setEditProd] = useState(null); // aquí guardamos el producto en edición
+  const [types, setTypes] = useState([]);         // Lista de type_productos
+  const [isEdited, setIsEdited] = useState(false);
+  const [editProd, setEditProd] = useState(null);
   const token = localStorage.getItem("token");
 
-  // Cargar la lista de productos al montar el componente
   useEffect(() => {
     fetchProducts();
+    fetchTypeProducts(); // Cargar también la lista de type_productos
   }, []);
 
-  // Función para obtener productos del backend
+  // Obtener productos
   const fetchProducts = async () => {
     try {
       const res = await fetch("http://localhost:4000/api/products", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
         console.error("Error al obtener productos");
@@ -31,7 +30,24 @@ export default function ProductList() {
     }
   };
 
-  // Función para eliminar lógicamente (onDelete)
+  // Obtener lista de type_productos
+  const fetchTypeProducts = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/api/type_products", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        console.error("Error al obtener type_productos");
+        return;
+      }
+      const data = await res.json();
+      setTypes(data);  // Guardamos la lista de tipos en el state
+    } catch (error) {
+      console.error("Error al hacer fetch de type_productos:", error);
+    }
+  };
+
+  // Eliminar lógicamente
   const handleDelete = async (prod) => {
     try {
       const res = await fetch(`http://localhost:4000/api/products/${prod.id}/disable`, {
@@ -42,7 +58,6 @@ export default function ProductList() {
         },
         body: JSON.stringify({ is_active: false }),
       });
-
       if (!res.ok) {
         console.error("Error al eliminar producto");
         return;
@@ -54,29 +69,27 @@ export default function ProductList() {
     }
   };
 
-  // Función para iniciar el modo edición en UN producto
+  // Inicia modo edición
   const handleEdit = (prod) => {
     setIsEdited(true);
-    // Clonamos el producto a editar (para manipularlo sin cambiar la lista original)
     setEditProd({ ...prod });
   };
 
-  // Función para cancelar la edición
+  // Cancelar edición
   const handleCancel = () => {
     setIsEdited(false);
     setEditProd(null);
   };
 
-  // Función que maneja cambio de valor en los inputs (nombre, precio, stock, etc.)
+  // Manejo de cambios de campo
   const handleChange = (field, value) => {
-    // Actualizamos el campo en editProd
     setEditProd((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  // Función para guardar cambios (petición al backend)
+  // Guardar cambios
   const handleSave = async () => {
     try {
       const res = await fetch(`http://localhost:4000/api/products/${editProd.id}`, {
@@ -89,45 +102,49 @@ export default function ProductList() {
           nombre: editProd.nombre,
           precio: editProd.precio,
           stock: editProd.stock,
+          type_product_id: editProd.type_product_id, // Importante para actualizar el tipo
         }),
       });
-  
+
       if (!res.ok) {
         console.error("Error al actualizar producto");
         return;
       }
       console.log("Producto actualizado con éxito");
-  
-      // Salir de modo edición
       setIsEdited(false);
       setEditProd(null);
-  
-      // Recargar la lista
       fetchProducts();
     } catch (error) {
       console.error("Error al actualizar producto:", error);
     }
   };
 
+  // Función auxiliar para obtener el nombre del tipo según ID
+  const getTypeName = (typeId) => {
+    const found = types.find((t) => t.id === typeId);
+    return found ? found.nombre : "Sin tipo";
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">Lista de Productos</h1>
-      {products.map((prod) => (
-        <Product
-          key={prod.id}
-          prod={prod}
-          // estado global de si estamos editando algo
-          isEdited={isEdited}
-          // el producto que actualmente se está editando (o null)
-          editProd={editProd}
-          // funciones
-          onDelete={handleDelete}
-          onEdit={handleEdit}
-          onCancel={handleCancel}
-          onChangeField={handleChange}
-          onSave={handleSave}
-        />
-      ))}
+      {products.map((prod) =>
+        prod.is_active ? (
+          <Product
+            key={prod.id}
+            prod={prod}
+            isEdited={isEdited}
+            editProd={editProd}
+            typeName={getTypeName(prod.type_product_id)} // Se lo pasamos
+            typeList={types} // Lista completa para el <select>
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+            onCancel={handleCancel}
+            onChangeField={handleChange}
+            onSave={handleSave}
+          />
+        ) : null
+      )}
     </div>
   );
 }

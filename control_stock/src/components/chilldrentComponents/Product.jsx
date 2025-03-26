@@ -9,14 +9,16 @@ const Product = ({
   onCancel,
   onChangeField,
   onSave,
+  typeList,       // lista de {id, nombre, is_active} de type_productos
+  typeName,       // nombre derivado del ID de este producto
 }) => {
-  // ¿Estamos editando justo este producto?
   const isThisBeingEdited = isEdited && editProd && editProd.id === prod.id;
 
   if (isThisBeingEdited) {
-    // Modo edición: mostramos inputs para (nombre, precio, stock, etc.)
+    // Modo edición
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 border p-2 mb-2">
+        {/* Nombre */}
         <div>
           <label className="font-semibold block">Nombre:</label>
           <input
@@ -25,6 +27,8 @@ const Product = ({
             onChange={(e) => onChangeField("nombre", e.target.value)}
           />
         </div>
+
+        {/* Precio */}
         <div>
           <label className="font-semibold block">Precio:</label>
           <input
@@ -34,6 +38,8 @@ const Product = ({
             onChange={(e) => onChangeField("precio", e.target.value)}
           />
         </div>
+
+        {/* Stock */}
         <div>
           <label className="font-semibold block">Stock:</label>
           <input
@@ -43,13 +49,24 @@ const Product = ({
             onChange={(e) => onChangeField("stock", e.target.value)}
           />
         </div>
+
+        {/* Seleccionar tipo de producto */}
         <div>
-          <p className="font-semibold">
-            Creado por: <span className="font-normal">{prod.created_by}</span>
-          </p>
-          <p className="font-semibold">
-            Activo: <span className="font-normal">{prod.is_active ? "Sí" : "No"}</span>
-          </p>
+          <label className="font-semibold block">Tipo producto:</label>
+          <select
+            className="border p-1 w-full"
+            value={editProd.type_product_id || ""}
+            onChange={(e) => onChangeField("type_product_id", parseInt(e.target.value))}
+          >
+            <option value="">-- Seleccionar --</option>
+            {typeList.map((t) =>
+              t.is_active ? (
+                <option key={t.id} value={t.id}>
+                  {t.nombre}
+                </option>
+              ) : null
+            )}
+          </select>
         </div>
 
         {/* Botones Guardar/Cancelar */}
@@ -70,16 +87,27 @@ const Product = ({
       </div>
     );
   } else {
-    // Modo normal: mostramos <p> con la info + Editar/Eliminar
+    // Modo normal
     return (
-      <div
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 border p-2 mb-2"
-      >
-        <p className="font-semibold">Nombre: <span className="font-normal">{prod.nombre}</span></p>
-        <p className="font-semibold">Precio: <span className="font-normal">{prod.precio}</span></p>
-        <p className="font-semibold">Stock: <span className="font-normal">{prod.stock}</span></p>
-        <p className="font-semibold">Creado por: <span className="font-normal">{prod.created_by}</span></p>
-        <p className="font-semibold">Activo: <span className="font-normal">{prod.is_active ? "Sí" : "No"}</span></p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 border p-2 mb-2">
+        <p className="font-semibold">
+          Nombre: <span className="font-normal">{prod.nombre}</span>
+        </p>
+        <p className="font-semibold">
+          Precio: <span className="font-normal">{prod.precio}</span>
+        </p>
+        <p className="font-semibold">
+          Stock: <span className="font-normal">{prod.stock}</span>
+        </p>
+        <p className="font-semibold">
+          Creado por: <span className="font-normal">{prod.created_by}</span>
+        </p>
+        <p className="font-semibold">
+          Tipo producto: <span className="font-normal">{typeName}</span>
+        </p>
+        <p className="font-semibold">
+          Activo: <span className="font-normal">{prod.is_active ? "Sí" : "No"}</span>
+        </p>
 
         <div className="flex gap-2 sm:col-span-2 md:col-span-3 lg:col-span-5">
           <button
